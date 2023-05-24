@@ -110,9 +110,9 @@ public:
 	~PhoneBook() {
 		for (int i = 0; i < phoneBook.size(); ++i) {
 			delete phoneBook.at(i);
-			std::cout << "Освобождена память для " << i << " записи из вектора phoneBook.\n";
+			//std::cout << "Освобождена память для " << i << " записи из вектора phoneBook.\n";
 		}
-		std::cout << "Отработал деструктор\n";
+		//std::cout << "Отработал деструктор\n";
 	}
 
 };
@@ -139,7 +139,7 @@ int main() {
 	setlocale(LC_ALL, "Russian");
 	SetConsoleCP(1251); 
 	PhoneBook phoneBook;
-	if (phoneBook.ReadFromFile() == false) {
+	if (phoneBook.ReadFromFile() == false) {	// чтение телефонной книги из файла
 		std::cout << "Ошибка чтения из файла.\n";
 		system("cls");
 	}
@@ -147,15 +147,15 @@ int main() {
 	int choice = 0;
 	do {
 		choice = menu();
-		if (choice == 1) {
+		if (choice == 1) { // добавление записи в телефонную книгу
 			phoneBook.addPhoneToBook();
 		}
-		else if (choice == 2) {
+		else if (choice == 2) {	// вывод на экран телефонной книги
 			system("cls");
 			phoneBook.Print();
 			system("pause");
 		}
-		else if (choice == 3) {
+		else if (choice == 3) {	// удаление записи из телефонной книги
 			system("cls");
 			phoneBook.Print();
 			int numRec = 0;
@@ -167,7 +167,7 @@ int main() {
 				continue;
 			phoneBook.EraseRecord(numRec - 1);
 		}
-		else if (choice == 4) {
+		else if (choice == 4) {	// поиск по фамилии, имени или отчеству
 			std::string str;
 			std::cout << "Введите фамилию или имя или отчество -> ";
 			std::cin.ignore();
@@ -178,7 +178,7 @@ int main() {
 
 	} while (choice != 5);
 
-	if (phoneBook.WriteTofile() == false) {
+	if (phoneBook.WriteTofile() == false) { // запись телефонной книги в файл
 		std::cout << "Ошибка записи в файл.\n";
 	}
 
@@ -219,9 +219,7 @@ void PhoneBook::addPhoneToBook() {
 	std::getline(std::cin, mobilePhoneNumber);
 	std::cout << "Введите дополнительную информацию -> ";
 	std::getline(std::cin, additionalInfo);
-	PhoneInfo tmp(name, surname, patronymic, homePhoneNumber, mobilePhoneNumber, workPhoneNumber, additionalInfo);
-	PhoneInfo* p_tmp = new PhoneInfo;
-	*p_tmp = tmp;
+	PhoneInfo* p_tmp = new PhoneInfo(name, surname, patronymic, homePhoneNumber, mobilePhoneNumber, workPhoneNumber, additionalInfo);
 	phoneBook.push_back(p_tmp);
 }
 
@@ -263,9 +261,7 @@ bool PhoneBook::ReadFromFile() {
 			std::getline(fin, workPhoneNumber); if (fin.eof()) break;
 			std::getline(fin, mobilePhoneNumber); if (fin.eof()) break;
 			std::getline(fin, additionalInfo); if (fin.eof()) break;
-			PhoneInfo tmp(name, surname, patronymic, homePhoneNumber, mobilePhoneNumber, workPhoneNumber, additionalInfo);
-			PhoneInfo* p_tmp = new PhoneInfo;
-			*p_tmp = tmp;
+			PhoneInfo* p_tmp = new PhoneInfo(name, surname, patronymic, homePhoneNumber, mobilePhoneNumber, workPhoneNumber, additionalInfo);
 			phoneBook.push_back(p_tmp);
 			name = ""; surname = ""; patronymic = ""; homePhoneNumber = ""; mobilePhoneNumber = ""; workPhoneNumber = ""; additionalInfo = "";
 		}
