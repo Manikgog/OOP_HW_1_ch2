@@ -4,7 +4,7 @@
 хранить данные об абоненте (ФИО, домашний телефон,
 рабочий телефон, мобильный телефон, дополнительная
 информация о контакте) внутри соответствующего класса.
-Наполните класс переменными-членами, функциямичленами, 
+Наполните класс переменными-членами, функциями-членами, 
 конструкторами, inline-функциями-членами,
 используйте инициализаторы, реализуйте деструктор.
 Обязательно необходимо выделять динамически память под
@@ -47,47 +47,47 @@ public:
 																			_workPhoneNumber(workPhoneNumber), _additionalInfo(additionalInfo)
 	{}
 
-	std::string GetName() {
+	std::string GetName() const {
 		return _name;
 	}
 
-	std::string GetSurname() {
+	std::string GetSurname() const {
 		return _surname;
 	}
 
-	std::string GetPatronimic() {
+	std::string GetPatronimic() const {
 		return _patronymic;
 	}
 
-	std::string GetHomePhoneNumber() {
+	std::string GetHomePhoneNumber() const {
 		return _homePhoneNumber;
 	}
 
-	std::string GetMobilePhoneNumber() {
+	std::string GetMobilePhoneNumber() const {
 		return _mobilePhoneNumber;
 	}
 
-	std::string GetWorkPhoneNumber() {
+	std::string GetWorkPhoneNumber() const {
 		return _workPhoneNumber;
 	}
 
-	std::string GetAdditionalInfo() {
+	std::string GetAdditionalInfo() const {
 		return _additionalInfo;
 	}
 
-	void Print();
+	void Print() const;
 
 };
 
 class PhoneBook {
 private:
-	std::vector<PhoneInfo> phoneBook;
+	std::vector<PhoneInfo*> phoneBook;
 
 public:
 	PhoneBook() {
 		phoneBook;
 	}
-	PhoneBook(std::vector<PhoneInfo>& book) {
+	PhoneBook(std::vector<PhoneInfo*>& book) {
 		phoneBook = book;
 	}
 
@@ -97,8 +97,8 @@ public:
 
 	void EraseRecord(int numRec);
 
-	int Size() {
-		return phoneBook.size();
+	int Size() const {
+		return (int)phoneBook.size();
 	}
 
 	bool ReadFromFile();
@@ -106,6 +106,14 @@ public:
 	bool WriteTofile();
 
 	void SearcBySNP(std::string& str);
+
+	~PhoneBook() {
+		for (int i = 0; i < phoneBook.size(); ++i) {
+			delete phoneBook.at(i);
+			std::cout << "Освобождена память для " << i << " записи из вектора phoneBook.\n";
+		}
+		std::cout << "Отработал деструктор\n";
+	}
 
 };
 
@@ -143,16 +151,20 @@ int main() {
 			phoneBook.addPhoneToBook();
 		}
 		else if (choice == 2) {
+			system("cls");
 			phoneBook.Print();
 			system("pause");
 		}
 		else if (choice == 3) {
+			system("cls");
 			phoneBook.Print();
 			int numRec = 0;
 			do {
-				std::cout << "Введите номер записи для удаления -> ";
+				std::cout << "Введите номер записи для удаления (Выход в меню - " << phoneBook.Size()+1 << ")" << " -> ";
 				std::cin >> numRec;
-			} while (numRec < 1 || numRec > phoneBook.Size());
+			} while (numRec < 1 || numRec > phoneBook.Size() + 1);
+			if (numRec == phoneBook.Size() + 1)
+				continue;
 			phoneBook.EraseRecord(numRec - 1);
 		}
 		else if (choice == 4) {
@@ -174,7 +186,7 @@ int main() {
 }
 
 
-void PhoneInfo::Print() {
+void PhoneInfo::Print() const {
 	std::cout << _surname << ' ' << _name << ' ' << _patronymic << std::endl;
 	std::cout << "Домашний телефон: " << _homePhoneNumber << std::endl;
 	std::cout << "Рабочий телефон: " << _workPhoneNumber << std::endl;
@@ -208,15 +220,17 @@ void PhoneBook::addPhoneToBook() {
 	std::cout << "Введите дополнительную информацию -> ";
 	std::getline(std::cin, additionalInfo);
 	PhoneInfo tmp(name, surname, patronymic, homePhoneNumber, mobilePhoneNumber, workPhoneNumber, additionalInfo);
-	phoneBook.push_back(tmp);
+	PhoneInfo* p_tmp = new PhoneInfo;
+	*p_tmp = tmp;
+	phoneBook.push_back(p_tmp);
 }
 
 void PhoneBook::Print() {
-	std::vector<PhoneInfo>::iterator it;
+	std::vector<PhoneInfo*>::iterator it;
 	int count = 1;
 	for (it = phoneBook.begin(); it != phoneBook.end(); ++it) {
 		std::cout << "Запись №" << count << std::endl;
-		it->Print();
+		(*it)->Print();
 		count++;
 	}
 }
@@ -224,6 +238,7 @@ void PhoneBook::Print() {
 void PhoneBook::EraseRecord(int numRec) {
 	if (numRec < 0 || numRec > phoneBook.size() - 1)
 		return;
+	delete phoneBook.at(numRec);
 	phoneBook.erase(phoneBook.begin() + numRec);
 	return;
 }
@@ -249,7 +264,9 @@ bool PhoneBook::ReadFromFile() {
 			std::getline(fin, mobilePhoneNumber); if (fin.eof()) break;
 			std::getline(fin, additionalInfo); if (fin.eof()) break;
 			PhoneInfo tmp(name, surname, patronymic, homePhoneNumber, mobilePhoneNumber, workPhoneNumber, additionalInfo);
-			phoneBook.push_back(tmp);
+			PhoneInfo* p_tmp = new PhoneInfo;
+			*p_tmp = tmp;
+			phoneBook.push_back(p_tmp);
 			name = ""; surname = ""; patronymic = ""; homePhoneNumber = ""; mobilePhoneNumber = ""; workPhoneNumber = ""; additionalInfo = "";
 		}
 
@@ -263,15 +280,15 @@ bool PhoneBook::WriteTofile() {
 	std::ofstream fout;
 	fout.open(filename);
 	if (fout.is_open()) {
-		std::vector<PhoneInfo>::iterator it;
+		std::vector<PhoneInfo*>::iterator it;
 		for (it = phoneBook.begin(); it != phoneBook.end(); ++it) {
-			fout << it->GetName() << '\n';
-			fout << it->GetSurname() << '\n';
-			fout << it->GetPatronimic() << '\n';
-			fout << it->GetHomePhoneNumber() << '\n';
-			fout << it->GetWorkPhoneNumber() << '\n';
-			fout << it->GetMobilePhoneNumber() << '\n';
-			fout << it->GetAdditionalInfo() << '\n';
+			fout << (*it)->GetName() << '\n';
+			fout << (*it)->GetSurname() << '\n';
+			fout << (*it)->GetPatronimic() << '\n';
+			fout << (*it)->GetHomePhoneNumber() << '\n';
+			fout << (*it)->GetWorkPhoneNumber() << '\n';
+			fout << (*it)->GetMobilePhoneNumber() << '\n';
+			fout << (*it)->GetAdditionalInfo() << '\n';
 		}
 		fout.close();
 		return true;
@@ -280,10 +297,10 @@ bool PhoneBook::WriteTofile() {
 }
 
 void PhoneBook::SearcBySNP(std::string& str) {
-	std::vector<PhoneInfo>::iterator it;
+	std::vector<PhoneInfo*>::iterator it;
 	for (it = phoneBook.begin(); it != phoneBook.end(); ++it) {
-		if (str == it->GetName() || str == it->GetSurname() || str == it->GetPatronimic()) {
-			it->Print();
+		if (str == (*it)->GetName() || str == (*it)->GetSurname() || str == (*it)->GetPatronimic()) {
+			(*it)->Print();
 		}
 	}
 }
