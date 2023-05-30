@@ -127,7 +127,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="functions.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="phone_book.cpp" />
+    <ClCompile Include="phone_info.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="functions.hpp" />
+    <ClInclude Include="phone_book.hpp" />
+    <ClInclude Include="phone_info.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
