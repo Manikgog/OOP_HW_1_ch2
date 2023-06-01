@@ -1,6 +1,5 @@
 #include "functions.hpp"
-#include <iostream>
-#include <Windows.h>
+
 
 int menu() {
 	static int n;

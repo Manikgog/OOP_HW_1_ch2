@@ -1,5 +1,5 @@
 #include "phone_info.hpp"
-#include <iostream>
+
 
 void PhoneInfo::Print() const {
 	std::cout << _surname << ' ' << _name << ' ' << _patronymic << std::endl;

@@ -1,7 +1,9 @@
 #ifndef _PHONE_BOOK_HPP_
 #define _PHONE_BOOK_HPP_
-
+#include <string>
+#include <iostream>
 #include <vector>
+#include <fstream>
 #include "phone_info.hpp"
 
 class PhoneBook {
